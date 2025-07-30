@@ -226,18 +226,6 @@ void CartesianImpedanceExampleController::equilibriumPoseCallback(
     orientation_d_target_.coeffs() << -orientation_d_target_.coeffs();
   }
 }
-
-Eigen::Matrix<double, 7, 1> CartesianImpedanceExampleController::saturateTorqueRate(
-    const Eigen::Matrix<double, 7, 1>& tau_d_calculated,
-    const Eigen::Matrix<double, 7, 1>& tau_j_d) {  // NOLINT (readability-identifier-naming)
-  Eigen::Matrix<double, 7, 1> tau_d_saturated{};
-  for (size_t i = 0; i < 7; i++) {
-    double difference = tau_d_calculated[i] - tau_j_d[i];
-    tau_d_saturated[i] =
-        tau_j_d[i] + std::max(std::min(difference, delta_tau_max_), -delta_tau_max_);
-  }
-  return tau_d_saturated;
-}
 }  // namespace franka_example_controllers
 
 // Expose the controller as visible to the rest of ros2_control

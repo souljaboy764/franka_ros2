@@ -68,7 +68,7 @@ def generate_launch_description():
         ),
         Node(
             package='franka_example_controllers',
-            executable='equilibrium_pose_publisher',
+            executable='interactive_marker.py',
             output='screen',
         ),
     ])

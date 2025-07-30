@@ -28,13 +28,6 @@ find_package(moveit_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
 
-add_executable(equilibrium_pose_publisher src/equilibrium_pose_publisher.cpp)
-# Link the executable with the necessary libraries
-ament_target_dependencies(equilibrium_pose_publisher
-  rclcpp
-  geometry_msgs
-)
-
 add_library(
         ${PROJECT_NAME}
         SHARED
@@ -85,6 +78,8 @@ install(
         DIRECTORY include/
         DESTINATION include
 )
+
+install(PROGRAMS scripts/interactive_marker.py DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
     find_package(ament_cmake_clang_format REQUIRED)

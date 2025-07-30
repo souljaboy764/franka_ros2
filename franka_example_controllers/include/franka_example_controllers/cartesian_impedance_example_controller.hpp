@@ -70,12 +70,14 @@ class CartesianImpedanceExampleController : public controller_interface::Control
   double filter_params_{0.005};
   double nullspace_stiffness_{20.0};
   double nullspace_stiffness_target_{20.0};
+  double translational_stiffness_{250.0};
+  double translational_stiffness_target_{250.0};
+  double rotational_stiffness_{30.0};
+  double rotational_stiffness_target_{30.0};
   const double delta_tau_max_{1.0};
 
   Eigen::Matrix<double, 6, 6> cartesian_stiffness_;
-  Eigen::Matrix<double, 6, 6> cartesian_stiffness_target_;
   Eigen::Matrix<double, 6, 6> cartesian_damping_;
-  Eigen::Matrix<double, 6, 6> cartesian_damping_target_;
   Eigen::Matrix<double, 7, 1> q_d_nullspace_;
   Eigen::Vector3d position_d_;
   Eigen::Quaterniond orientation_d_;

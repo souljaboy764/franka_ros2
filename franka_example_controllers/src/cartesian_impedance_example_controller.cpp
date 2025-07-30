@@ -22,18 +22,16 @@ CartesianImpedanceExampleController::CallbackReturn CartesianImpedanceExampleCon
   orientation_d_target_.coeffs() << 0.0, 0.0, 0.0, 1.0;
 
   // Compliance parameters
-  const double translational_stiffness{150.0};
-  const double rotational_stiffness{10.0};
   cartesian_stiffness_.setZero();
   cartesian_stiffness_.topLeftCorner(3, 3)
-      << translational_stiffness * Eigen::MatrixXd::Identity(3, 3);
+      << translational_stiffness_ * Eigen::MatrixXd::Identity(3, 3);
   cartesian_stiffness_.bottomRightCorner(3, 3)
-      << rotational_stiffness * Eigen::MatrixXd::Identity(3, 3);
+      << rotational_stiffness_ * Eigen::MatrixXd::Identity(3, 3);
   cartesian_damping_.setZero();
   cartesian_damping_.topLeftCorner(3, 3)
-      << 2.0 * sqrt(translational_stiffness) * Eigen::MatrixXd::Identity(3, 3);
+      << 2.0 * sqrt(translational_stiffness_) * Eigen::MatrixXd::Identity(3, 3);
   cartesian_damping_.bottomRightCorner(3, 3)
-      << 2.0 * sqrt(rotational_stiffness) * Eigen::MatrixXd::Identity(3, 3);
+      << 2.0 * sqrt(rotational_stiffness_) * Eigen::MatrixXd::Identity(3, 3);
   return CallbackReturn::SUCCESS;
 }
 
@@ -182,19 +180,17 @@ controller_interface::return_type CartesianImpedanceExampleController::update(
   // Desired torque
   tau_d << tau_task + tau_nullspace + coriolis;
 
-  // saturate the commanded torque to joint limits
-  tau_d << saturateTorqueRate(tau_d, tau_j_d);
 
   for (int i = 0; i < num_joints; i++) {
     command_interfaces_[i].set_value(tau_d[i]);
   }
 
-  // update parameters changed online either through dynamic reconfigure or through the interactive
+  // TODO: update parameters changed online either through dynamic reconfigure or through the interactive
   // target by filtering
-  cartesian_stiffness_ =
-      filter_params_ * cartesian_stiffness_target_ + (1.0 - filter_params_) * cartesian_stiffness_;
-  cartesian_damping_ =
-      filter_params_ * cartesian_damping_target_ + (1.0 - filter_params_) * cartesian_damping_;
+  translational_stiffness_ =
+      filter_params_ * translational_stiffness_target_ + (1.0 - filter_params_) * translational_stiffness_;
+  rotational_stiffness_ =
+      filter_params_ * rotational_stiffness_target_ + (1.0 - filter_params_) * rotational_stiffness_;
   nullspace_stiffness_ =
       filter_params_ * nullspace_stiffness_target_ + (1.0 - filter_params_) * nullspace_stiffness_;
 
@@ -202,7 +198,7 @@ controller_interface::return_type CartesianImpedanceExampleController::update(
       position_and_orientation_d_target_mutex_);
   position_d_ = filter_params_ * position_d_target_ + (1.0 - filter_params_) * position_d_;
   orientation_d_ = orientation_d_.slerp(filter_params_, orientation_d_target_);
-
+  
   return controller_interface::return_type::OK;
 }
 
